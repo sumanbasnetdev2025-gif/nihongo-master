@@ -3,6 +3,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+// Supabase sometimes infers joined relations as arrays even for
+// one-to-one joins. This safely unwraps either shape into a single item.
+function firstOrSelf<T>(value: T | T[] | null | undefined): T | undefined {
+  if (!value) return undefined
+  return Array.isArray(value) ? value[0] : value
+}
+
 export async function toggleBookmark(questionId: string) {
   const supabase = await createClient()
   const {
@@ -65,6 +72,9 @@ export async function getBookmarkedQuestions() {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  // Only show bookmarks whose question is still published (admin may have unpublished it since)
-  return data.filter((b) => b.questions?.is_published)
+
+
+  return data
+    .map((b) => ({ ...b, questions: firstOrSelf(b.questions) }))
+    .filter((b) => b.questions?.is_published)
 }

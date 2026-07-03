@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Upload, X } from 'lucide-react'
-import { questionSchema, type QuestionInput } from './schemas'
+import { questionSchema, type QuestionFormValues, type QuestionInput } from './schemas'
 import { createQuestion, updateQuestion, getChaptersByLevel } from './actions'
 import { uploadQuestionImage, uploadQuestionAudio } from './upload'
 import { Button } from '@/components/ui/button'
@@ -58,11 +58,10 @@ export function QuestionFormDialog({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<QuestionInput>({
-    resolver: zodResolver(questionSchema),
-    defaultValues: { difficulty: 'medium', isPublished: false },
-  })
-
+ } = useForm<QuestionFormValues>({
+  resolver: zodResolver(questionSchema),
+  defaultValues: { difficulty: 'medium', isPublished: false },
+})
   const selectedLevelId = watch('levelId')
   const imageUrl = watch('imageUrl')
   const audioUrl = watch('audioUrl')
@@ -155,23 +154,26 @@ export function QuestionFormDialog({
     }
   }
 
-  const onSubmit = async (values: QuestionInput) => {
-    setLoading(true)
-    try {
-      if (isEditMode) {
-        await updateQuestion(editingQuestion.id, values)
-        toast.success('Question updated')
-      } else {
-        await createQuestion(values)
-        toast.success('Question created')
-      }
-      onOpenChange(false)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setLoading(false)
+const onSubmit = async (values: QuestionFormValues) => {
+  setLoading(true)
+  try {
+  
+    const parsed = questionSchema.parse(values)
+
+    if (isEditMode) {
+      await updateQuestion(editingQuestion.id, parsed)
+      toast.success('Question updated')
+    } else {
+      await createQuestion(parsed)
+      toast.success('Question created')
     }
+    onOpenChange(false)
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Something went wrong')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

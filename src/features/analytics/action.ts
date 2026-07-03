@@ -2,6 +2,11 @@
 
 import { createClient } from '@/lib/supabase/server'
 
+function firstOrSelf<T>(value: T | T[] | null | undefined): T | undefined {
+  if (!value) return undefined
+  return Array.isArray(value) ? value[0] : value
+}
+
 export async function getPerformanceAnalytics() {
   const supabase = await createClient()
 
@@ -56,11 +61,17 @@ export async function getPerformanceAnalytics() {
   // ---- Category strengths ----
   const categoryMap = new Map<string, { name: string; correct: number; total: number }>()
   for (const answer of answers) {
-    const cat = answer.questions?.categories
-    const catId = answer.questions?.category_id
-    if (!cat || !catId) continue
+    const question = firstOrSelf(answer.questions)
+    if (!question) continue
+
+    const catId = question.category_id
+    if (!catId) continue
+
+    const categoryName = firstOrSelf(question.categories)?.name
+    if (!categoryName) continue
+
     if (!categoryMap.has(catId)) {
-      categoryMap.set(catId, { name: cat.name, correct: 0, total: 0 })
+      categoryMap.set(catId, { name: categoryName, correct: 0, total: 0 })
     }
     const entry = categoryMap.get(catId)!
     entry.total += 1
@@ -73,11 +84,17 @@ export async function getPerformanceAnalytics() {
   // ---- Chapter performance (for weak chapter detection) ----
   const chapterMap = new Map<string, { title: string; correct: number; total: number }>()
   for (const answer of answers) {
-    const chapter = answer.questions?.chapters
-    const chapterId = answer.questions?.chapter_id
-    if (!chapter || !chapterId) continue
+    const question = firstOrSelf(answer.questions)
+    if (!question) continue
+
+    const chapterId = question.chapter_id
+    if (!chapterId) continue
+
+    const chapterTitle = firstOrSelf(question.chapters)?.title
+    if (!chapterTitle) continue
+
     if (!chapterMap.has(chapterId)) {
-      chapterMap.set(chapterId, { title: chapter.title, correct: 0, total: 0 })
+      chapterMap.set(chapterId, { title: chapterTitle, correct: 0, total: 0 })
     }
     const entry = chapterMap.get(chapterId)!
     entry.total += 1

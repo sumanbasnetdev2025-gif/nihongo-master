@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { chapterSchema, type ChapterInput } from './schemas'
+import { chapterSchema, type ChapterFormValues, type ChapterInput } from './schemas'
 import { createChapter, updateChapter } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +18,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { NativeSelect } from '@/components/ui/native-select'
-
 interface Level {
   id: string
   code: string
@@ -54,11 +53,10 @@ export function ChapterFormDialog({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<ChapterInput>({
-    resolver: zodResolver(chapterSchema),
-    defaultValues: { sortOrder: 0 },
-  })
-
+ } = useForm<ChapterFormValues>({
+  resolver: zodResolver(chapterSchema),
+  defaultValues: { sortOrder: 0 },
+})
   // Pre-fill form when editing
   useEffect(() => {
     if (editingChapter) {
@@ -73,23 +71,27 @@ export function ChapterFormDialog({
     }
   }, [editingChapter, reset])
 
-  const onSubmit = async (values: ChapterInput) => {
-    setLoading(true)
-    try {
-      if (isEditMode) {
-        await updateChapter(editingChapter.id, values)
-        toast.success('Chapter updated successfully')
-      } else {
-        await createChapter(values)
-        toast.success('Chapter created successfully')
-      }
-      onOpenChange(false)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setLoading(false)
+const onSubmit = async (values: ChapterFormValues) => {
+  setLoading(true)
+  try {
+    // Run Zod's coercion client-side too, so the type passed to the
+    // Server Action matches exactly what it expects (sortOrder as a real number)
+    const parsed = chapterSchema.parse(values)
+
+    if (isEditMode) {
+      await updateChapter(editingChapter.id, parsed)
+      toast.success('Chapter updated successfully')
+    } else {
+      await createChapter(parsed)
+      toast.success('Chapter created successfully')
     }
+    onOpenChange(false)
+  } catch (err) {
+    toast.error(err instanceof Error ? err.message : 'Something went wrong')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

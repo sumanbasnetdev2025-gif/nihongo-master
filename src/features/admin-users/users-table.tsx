@@ -226,7 +226,7 @@ export function UsersTable() {
                             )}
                           </Button>
                           <DropdownMenu>
-                            <DropdownMenuTrigger asChild className="sm:hidden">
+                            <DropdownMenuTrigger className="sm:hidden">
                               <Button variant="ghost" size="icon" className="h-8 w-8">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -301,7 +301,7 @@ export function UsersTable() {
                         </div>
                       </div>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
                             <MoreVertical className="h-4 w-4" />
                           </Button>

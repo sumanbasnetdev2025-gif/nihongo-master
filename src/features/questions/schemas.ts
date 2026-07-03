@@ -28,4 +28,8 @@ export const questionSchema = z.object({
   isPublished: z.boolean().default(false),
 })
 
-export type QuestionInput = z.infer<typeof questionSchema>
+
+export type QuestionFormValues = z.input<typeof questionSchema>
+
+
+export type QuestionInput = z.output<typeof questionSchema>

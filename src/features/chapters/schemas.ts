@@ -7,4 +7,6 @@ export const chapterSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).default(0),
 })
 
-export type ChapterInput = z.infer<typeof chapterSchema>
+export type ChapterFormValues = z.input<typeof chapterSchema>
+
+export type ChapterInput = z.output<typeof chapterSchema>

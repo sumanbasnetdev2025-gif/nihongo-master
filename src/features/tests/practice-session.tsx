@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, XCircle } from 'lucide-react'
-import { usePracticeStore } from '@/store/practice-store'
 import { recordAnswer, completeTestAttempt } from './actions'
 import { QuestionCard } from './question-card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getBookmarkedQuestionIds } from '@/features/bookmarks/actions'
+import { usePracticeStore } from '@/stores/practice-store'
 
 interface PracticeSessionProps {
   attemptId: string

@@ -6,6 +6,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookmarkButton } from "@/features/bookmarks/bookmark-button";
 
+interface BookmarkedQuestion {
+  correct_option: "a" | "b" | "c" | "d";
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+}
+
+function getCorrectOptionText(q: BookmarkedQuestion): string {
+  switch (q.correct_option) {
+    case "a":
+      return q.option_a;
+    case "b":
+      return q.option_b;
+    case "c":
+      return q.option_c;
+    case "d":
+      return q.option_d;
+  }
+}
 export default async function BookmarksPage() {
   const bookmarks = await getBookmarkedQuestions();
 
@@ -36,9 +56,7 @@ export default async function BookmarksPage() {
       ) : (
         <div className="space-y-4">
           {bookmarks.map((b) => {
-            // Supabase's type inference sometimes returns joined relations as
-            // arrays even for one-to-one joins — normalize to a single object here
-            const q = Array.isArray(b.questions) ? b.questions[0] : b.questions;
+            const q = b.questions;
             if (!q) return null;
 
             const level = Array.isArray(q.levels) ? q.levels[0] : q.levels;
@@ -68,7 +86,7 @@ export default async function BookmarksPage() {
                     Correct answer:{" "}
                     <span className="font-medium text-foreground">
                       {q.correct_option.toUpperCase()}.{" "}
-                      {q[`option_${q.correct_option}` as const]}
+                      {getCorrectOptionText(q)}
                     </span>
                   </p>
                   {q.explanation && (

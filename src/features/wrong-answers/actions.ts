@@ -2,6 +2,13 @@
 
 import { createClient } from '@/lib/supabase/server'
 
+// Supabase sometimes infers joined relations as arrays even for
+// one-to-one joins. This safely unwraps either shape into a single item.
+function firstOrSelf<T>(value: T | T[] | null | undefined): T | undefined {
+  if (!value) return undefined
+  return Array.isArray(value) ? value[0] : value
+}
+
 export async function getWrongAnswerQuestions() {
   const supabase = await createClient()
   const {
@@ -40,8 +47,9 @@ export async function getWrongAnswerQuestions() {
   // De-duplicate — a question missed more than once should only appear once
   const uniqueMap = new Map()
   for (const row of wrongAnswers) {
-    if (row.questions?.is_published && !uniqueMap.has(row.question_id)) {
-      uniqueMap.set(row.question_id, row.questions)
+    const question = firstOrSelf(row.questions)
+    if (question?.is_published && !uniqueMap.has(row.question_id)) {
+      uniqueMap.set(row.question_id, question)
     }
   }
 
