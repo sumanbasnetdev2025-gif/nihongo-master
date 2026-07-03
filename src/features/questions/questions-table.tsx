@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 interface QuestionsTableProps {
   questions: any[]
@@ -115,10 +116,13 @@ export function QuestionsTable({
   <option value="published">Published</option>
   <option value="draft">Draft</option>
 </NativeSelect>
-        <Button onClick={handleCreate} className="ml-auto">
-          <Plus className="mr-2 h-4 w-4" />
-          New Question
-        </Button>
+        <div className="ml-auto flex gap-2">
+  <Button variant="outline" render={<Link href="/admin/questions/bulk">Bulk Add</Link>} nativeButton={false} />
+  <Button onClick={handleCreate}>
+    <Plus className="mr-2 h-4 w-4" />
+    New Question
+  </Button>
+</div>
       </div>
 
       {/* Table */}

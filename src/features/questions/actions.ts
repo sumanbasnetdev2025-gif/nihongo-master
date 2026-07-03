@@ -136,3 +136,44 @@ export async function toggleQuestionPublish(id: string, isPublished: boolean) {
   if (error) throw error
   revalidatePath('/admin/questions')
 }
+export async function createQuestionsBulk(input: {
+  levelId: string
+  chapterId?: string
+  categoryId: string
+  isPublished: boolean
+  questions: {
+    questionText: string
+    optionA: string
+    optionB: string
+    optionC: string
+    optionD: string
+    correctOption: 'a' | 'b' | 'c' | 'd'
+    explanation?: string
+  }[]
+}) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const rows = input.questions.map((q) => ({
+    level_id: input.levelId,
+    chapter_id: input.chapterId || null,
+    category_id: input.categoryId,
+    question_text: q.questionText,
+    option_a: q.optionA,
+    option_b: q.optionB,
+    option_c: q.optionC,
+    option_d: q.optionD,
+    correct_option: q.correctOption,
+    explanation: q.explanation || null,
+    is_published: input.isPublished,
+    created_by: user?.id,
+  }))
+
+  const { error, count } = await supabase.from('questions').insert(rows, { count: 'exact' })
+
+  if (error) throw error
+  revalidatePath('/admin/questions')
+  return { inserted: count ?? rows.length }
+}
