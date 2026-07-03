@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, Clock } from 'lucide-react'
-import { useExamStore } from '@/store/exam-store'
 import { useCountdown } from '@/hooks/use-countdown'
 import { recordAnswer, completeTestAttempt } from './actions'
 import { QuestionCard } from './question-card'
@@ -20,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useExamStore } from '@/stores/exam-store'
 
 interface ExamSessionProps {
   attemptId: string
