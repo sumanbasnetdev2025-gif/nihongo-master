@@ -14,7 +14,7 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: 'Nihongo Master — JLPT Mock Tests',
+  title: 'Nihongo Master- JLPT Mock Tests',
   description: 'Premium JLPT N5–N1 practice tests, progress tracking, and exam simulation.',
 }
 

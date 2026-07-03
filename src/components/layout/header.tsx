@@ -26,13 +26,13 @@ export function Header({ fullName, avatarUrl, mobileNav, brandLabel = 'Nihongo M
     : 'U'
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-4 md:px-6">
-      <div className="flex items-center gap-2">
-        {mobileNav}
-<span className="truncate text-base font-bold tracking-tight sm:text-lg md:hidden">{brandLabel}</span>
-      </div>
+    <header className="flex h-16 w-full items-center justify-between overflow-hidden border-b bg-background px-3 md:px-6">
+  <div className="flex min-w-0 flex-1 items-center gap-1.5">
+    {mobileNav}
+    <span className="truncate text-sm font-bold tracking-tight sm:text-lg md:hidden">{brandLabel}</span>
+  </div>
 
-<div className="flex items-center gap-2 sm:gap-4">
+  <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
           <button
           onClick={() => setRenameOpen(true)}
           className="group hidden items-center gap-1.5 text-sm font-medium md:flex"

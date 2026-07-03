@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { PublicHeader } from '@/components/layout/public-header'
 import { PublicFooter } from '@/components/layout/public-footer'
 import { motion } from 'framer-motion'
+import { Logo } from '@/components/shared/logo'
 
 const levels = [
   { 
@@ -282,20 +283,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA with gradient background */}
-        <section className="relative border-t py-20 bg-gradient-to-br from-primary/10 via-background to-muted/20 overflow-hidden">
-          <div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
-          <div className="absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="relative mx-auto max-w-2xl px-4 text-center md:px-6"
-          >
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            </div>
+        {/* CTA */}
+        <section className="border-t bg-muted/20 py-20">
+          <div className="mx-auto max-w-2xl px-4 text-center md:px-6">
+            <Logo className="mx-auto mb-6 h-12 w-12" />
             <h2 className="text-3xl font-bold tracking-tight">Ready to start your JLPT journey?</h2>
             <p className="mt-3 text-muted-foreground">
               Create a free account and take your first practice test in minutes.
@@ -303,9 +294,10 @@ export default function LandingPage() {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              className="mt-8"
             >
               <Link href="/register">
-                <Button size="lg" className="mt-8 group relative overflow-hidden">
+                <Button size="lg" className="group relative overflow-hidden">
                   <span className="relative z-10 flex items-center">
                     Get Started Free
                     <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -314,7 +306,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
         </section>
       </main>
 
