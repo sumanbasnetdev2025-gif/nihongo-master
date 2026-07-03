@@ -43,7 +43,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-3 sm:px-4 py-8 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="relative flex min-h-screen items-center justify-center px-4 sm:px-4 py-8 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
       {/* Animated background shapes */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute -top-40 -right-40 h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-primary/10 blur-3xl animate-pulse" />

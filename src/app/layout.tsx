@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Roboto } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   title: 'Nihongo Master- JLPT Mock Tests',
   description: 'Premium JLPT N5–N1 practice tests, progress tracking, and exam simulation.',
 }
-
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
 export default function RootLayout({
   children,
 }: {
