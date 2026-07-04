@@ -3,6 +3,15 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+// Fisher-Yates shuffle — ensures a genuinely random order/selection every call
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
 export async function getTestQuestions(params: {
   levelId: string
   categoryId?: string
@@ -19,9 +28,11 @@ export async function getTestQuestions(params: {
   if (params.categoryId) query = query.eq('category_id', params.categoryId)
   if (params.chapterId) query = query.eq('chapter_id', params.chapterId)
 
-  const { data, error } = await query.limit(params.limit ?? 20)
+  const { data, error } = await query.limit(200)
   if (error) throw error
-  return data
+
+  const shuffled = shuffleArray(data ?? [])
+  return shuffled.slice(0, params.limit ?? 20)
 }
 
 export async function startTestAttempt(params: {

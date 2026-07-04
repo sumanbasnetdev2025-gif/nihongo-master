@@ -30,12 +30,13 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
   const setExamSession = useExamStore((s) => s.setSession)
 
   const [levelId, setLevelId] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  const [categoryId, setCategoryId] = useState('mixed')
   const [chapterId, setChapterId] = useState('')
   const [chapters, setChapters] = useState<Option[]>([])
   const [loading, setLoading] = useState(false)
   const [mode, setMode] = useState<'practice' | 'exam'>('practice')
   const [duration, setDuration] = useState('20')
+  const [questionCount, setQuestionCount] = useState('20')
 
   useEffect(() => {
     if (levelId) {
@@ -48,6 +49,12 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
     setChapterId('')
   }, [levelId])
 
+  useEffect(() => {
+    if (mode === 'exam') {
+      setCategoryId('mixed')
+    }
+  }, [mode])
+
   const handleStart = async () => {
     if (!levelId || !categoryId) {
       toast.error('Please select a level and category')
@@ -55,24 +62,32 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
     }
     setLoading(true)
     try {
-      const questions = await getTestQuestions({
-        levelId,
-        categoryId,
-        chapterId: chapterId || undefined,
-        limit: 20,
-      })
+      const actualCategoryId = categoryId === 'mixed' ? undefined : categoryId
+      const limit = parseInt(questionCount, 10)
 
-      if (questions.length === 0) {
-        toast.error('No published questions found for this selection yet')
-        return
-      }
+  const questions = await getTestQuestions({
+  levelId,
+  categoryId: actualCategoryId,
+  chapterId: chapterId || undefined,
+  limit: Number(questionCount),
+})
 
+if (questions.length === 0) {
+  toast.error('No published questions found for this selection yet')
+  return
+}
+
+if (questions.length < Number(questionCount)) {
+  toast.info(
+    `Only ${questions.length} published questions available for this selection — starting with all of them.`
+  )
+}
       const attempt = await startTestAttempt({
         levelId,
-        categoryId,
+        categoryId: actualCategoryId,
         chapterId: chapterId || undefined,
         mode,
-        totalQuestions: questions.length,
+        totalQuestions: questions.length, // or limit if you prefer
       })
 
       if (mode === 'exam') {
@@ -126,7 +141,7 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
                 <span className="font-medium">Exam Mode</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Timed and realistic — answers are revealed only at the end.
+                Timed and realistic, answers are revealed only at the end.
               </p>
             </label>
           </RadioGroup>
@@ -144,7 +159,8 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* Updated grid: 4 columns */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <div className="space-y-2">
             <Label>Level</Label>
             <NativeSelect
@@ -163,12 +179,18 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
             <NativeSelect
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              placeholder="Select category"
+              disabled={mode === 'exam'}
             >
+              <option value="mixed">Mixed (All Categories)</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </NativeSelect>
+            {mode === 'exam' && (
+              <p className="text-xs text-muted-foreground">
+                Exam mode always draws random questions from every category of selected chapters.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -182,6 +204,21 @@ export function TestSetupForm({ levels, categories }: TestSetupFormProps) {
               {chapters.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
+            </NativeSelect>
+          </div>
+
+          {/* New field: Number of Questions */}
+          <div className="space-y-2">
+            <Label>Number of Questions</Label>
+            <NativeSelect
+              value={questionCount}
+              onChange={(e) => setQuestionCount(e.target.value)}
+            >
+              <option value="10">10 Questions</option>
+              <option value="20">20 Questions</option>
+              <option value="30">30 Questions</option>
+              <option value="40">40 Questions</option>
+              <option value="50">50 Questions</option>
             </NativeSelect>
           </div>
         </div>
