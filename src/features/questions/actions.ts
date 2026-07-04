@@ -177,3 +177,14 @@ export async function createQuestionsBulk(input: {
   revalidatePath('/admin/questions')
   return { inserted: count ?? rows.length }
 }
+export async function deleteQuestionsBulk(ids: string[]) {
+  const supabase = await createClient()
+  const { error, count } = await supabase
+    .from('questions')
+    .delete({ count: 'exact' })
+    .in('id', ids)
+
+  if (error) throw error
+  revalidatePath('/admin/questions')
+  return { deleted: count ?? ids.length }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getQuestions, getCategories } from '@/features/questions/actions'
 import { getLevels } from '@/features/chapters/actions'
 import { QuestionsTable } from '@/features/questions/questions-table'
@@ -19,12 +19,16 @@ export default function AdminQuestionsPage() {
     })
   }, [])
 
-  useEffect(() => {
+  const fetchQuestions = useCallback(() => {
     setLoading(true)
-    getQuestions(filters as any)
+    return getQuestions(filters as any)
       .then(setQuestions)
       .finally(() => setLoading(false))
   }, [filters])
+
+  useEffect(() => {
+    fetchQuestions()
+  }, [fetchQuestions])
 
   return (
     <div className="space-y-6">
@@ -44,6 +48,7 @@ export default function AdminQuestionsPage() {
           categories={categories}
           filters={filters}
           onFilterChange={setFilters}
+          onRefresh={fetchQuestions}
         />
       )}
     </div>
