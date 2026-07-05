@@ -6,13 +6,13 @@ import { usePathname } from 'next/navigation'
 import { Menu } from 'lucide-react'
 import {
   LayoutDashboard,
-  Users,
   BookOpen,
-  BookMarked,
+  Bookmark,
+  History,
   BarChart3,
   Settings,
-  FileQuestion,
-  LogOut,
+  Flame,
+  XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,16 +21,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { LogoutButton } from '@/components/ui/shared/logout-button'
+import { LogoutButton } from '@/components/shared/logout-button'
 
 const navItems = [
-  { href: '/admin', label: 'Overview', icon: LayoutDashboard },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/questions', label: 'Questions', icon: FileQuestion },
-  { href: '/admin/chapters', label: 'Chapters', icon: BookOpen },
-  { href: '/admin/bookmarks', label: 'Bookmarks', icon: BookMarked },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/tests', label: 'Tests', icon: BookOpen },
+  { href: '/daily-challenge', label: 'Daily Challenge', icon: Flame },
+  { href: '/bookmarks', label: 'Bookmarks', icon: Bookmark },
+  { href: '/wrong-answers', label: 'Wrong Answers', icon: XCircle },
+  { href: '/history', label: 'Test History', icon: History },
+  { href: '/progress', label: 'Progress', icon: BarChart3 },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export function MobileNav() {
@@ -45,14 +46,14 @@ export function MobileNav() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="left-0 top-0 h-full w-64 translate-x-0 translate-y-0 rounded-none p-0">
-          <DialogTitle className="sr-only">Admin Navigation Menu</DialogTitle>
+          <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
           <div className="flex h-16 items-center border-b px-6">
-            <span className="text-lg font-bold tracking-tight">Nihongo Master Admin</span>
+            <span className="text-lg font-bold tracking-tight">Nihongo Master</span>
           </div>
           <nav className="flex h-[calc(100%-4rem)] flex-col justify-between">
             <div className="space-y-1 p-4">
               {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+                const isActive = pathname === item.href
                 const Icon = item.icon
                 return (
                   <Link
@@ -73,13 +74,7 @@ export function MobileNav() {
               })}
             </div>
             <div className="border-t p-4">
-              <LogoutButton 
-                variant="ghost" 
-                size="sm" 
-                label="Log out" 
-                showIcon={true}
-                className="w-full justify-start text-muted-foreground hover:text-foreground"
-              />
+              <LogoutButton />
             </div>
           </nav>
         </DialogContent>
