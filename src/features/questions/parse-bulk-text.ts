@@ -7,25 +7,45 @@ export interface ParsedQuestion {
   correctOption?: 'a' | 'b' | 'c' | 'd'
 }
 
-const OPTION_LINE = /^(\*?)([A-Da-d])[.).]\s*(.+)$/
+// Matches lettered options: A. text / *B) text / etc.
+const LETTER_OPTION = /^(\*?)([A-Da-d])[.).]\s*(.+)$/
+// Matches numbered options: 1. text / *2. text / etc.
+const NUMBER_OPTION = /^(\*?)([1-4])[.).]\s*(.+)$/
+
 const LABEL_LINE = /^(もんだい|問題|Q\.?|Question)\s*\d*\s*[:.．]?\s*$/i
 
-function isOptionA(line: string): boolean {
-  const match = line.match(OPTION_LINE)
-  return !!match && match[2].toLowerCase() === 'a'
+// Maps a matched option line (either style) to a normalized letter + text + correctness
+function matchOption(line: string): { letter: 'a' | 'b' | 'c' | 'd'; text: string; isCorrect: boolean } | null {
+  const letterMatch = line.match(LETTER_OPTION)
+  if (letterMatch) {
+    const [, star, letter, text] = letterMatch
+    return { letter: letter.toLowerCase() as 'a' | 'b' | 'c' | 'd', text: text.trim(), isCorrect: star === '*' }
+  }
+
+  const numberMatch = line.match(NUMBER_OPTION)
+  if (numberMatch) {
+    const [, star, num, text] = numberMatch
+    const letterFromNumber = (['a', 'b', 'c', 'd'] as const)[Number(num) - 1]
+    return { letter: letterFromNumber, text: text.trim(), isCorrect: star === '*' }
+  }
+
+  return null
+}
+
+// Checks if a line looks like the FIRST option of either style (A. / 1.)
+// — this is what signals "options are starting now" while scanning
+function isFirstOption(line: string): boolean {
+  const match = matchOption(line)
+  return match?.letter === 'a'
 }
 
 function buildQuestionText(headerLines: string[]): string {
-  // Drop pure label lines like "もんだい５" or "Question 5" — they carry no
-  // actual question content, just a numbering marker
   const meaningful = headerLines.filter((line) => !LABEL_LINE.test(line))
 
   if (meaningful.length === 0) return headerLines.join(' ').trim()
 
   const joined = meaningful.join('\n').trim()
 
-  // If the entire remaining text is just a single bracket-quoted term,
-  // e.g. 「ぎんこういん」, unwrap the brackets for a cleaner question field
   const bracketMatch = joined.match(/^[「『](.+)[」』]$/)
   if (bracketMatch && meaningful.length === 1) {
     return bracketMatch[1].trim()
@@ -38,7 +58,7 @@ export function parseBulkQuestionText(raw: string): ParsedQuestion[] {
   const lines = raw
     .split('\n')
     .map((l) => l.trim())
-    .filter(Boolean) // blank lines are just visual spacing — ignore them entirely
+    .filter(Boolean)
 
   const results: ParsedQuestion[] = []
   let headerLines: string[] = []
@@ -47,9 +67,7 @@ export function parseBulkQuestionText(raw: string): ParsedQuestion[] {
   while (i < lines.length) {
     const line = lines[i]
 
-    // A new question's options start once we hit an "A." line —
-    // but only if we've actually collected some header/question text first
-    if (isOptionA(line) && headerLines.length > 0) {
+    if (isFirstOption(line) && headerLines.length > 0) {
       const optionLines = lines.slice(i, i + 4)
 
       if (optionLines.length === 4) {
@@ -58,15 +76,13 @@ export function parseBulkQuestionText(raw: string): ParsedQuestion[] {
         let allMatched = true
 
         optionLines.forEach((optLine) => {
-          const match = optLine.match(OPTION_LINE)
-          if (!match) {
+          const matched = matchOption(optLine)
+          if (!matched) {
             allMatched = false
             return
           }
-          const [, star, letter, text] = match
-          const key = letter.toLowerCase() as 'a' | 'b' | 'c' | 'd'
-          options[key] = text.trim()
-          if (star === '*') correctOption = key
+          options[matched.letter] = matched.text
+          if (matched.isCorrect) correctOption = matched.letter
         })
 
         if (allMatched) {
