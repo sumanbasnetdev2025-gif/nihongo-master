@@ -9,7 +9,12 @@ export default function AdminQuestionsPage() {
   const [questions, setQuestions] = useState<any[]>([])
   const [levels, setLevels] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
-  const [filters, setFilters] = useState<{ levelId?: string; categoryId?: string; status?: string }>({})
+  const [filters, setFilters] = useState<{
+    levelId?: string
+    categoryId?: string
+    status?: string
+    search?: string
+  }>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -26,9 +31,12 @@ export default function AdminQuestionsPage() {
       .finally(() => setLoading(false))
   }, [filters])
 
+  // Debounce only the search-driven refetches, so typing doesn't hammer
+  // the database on every keystroke — dropdown filter changes fire immediately
   useEffect(() => {
-    fetchQuestions()
-  }, [fetchQuestions])
+    const timeout = setTimeout(fetchQuestions, filters.search ? 350 : 0)
+    return () => clearTimeout(timeout)
+  }, [fetchQuestions, filters.search])
 
   return (
     <div className="space-y-6">

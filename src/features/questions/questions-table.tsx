@@ -29,12 +29,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 
 interface QuestionsTableProps {
   questions: any[]
   levels: any[]
   categories: any[]
-  filters: { levelId?: string; categoryId?: string; status?: string }
+  filters: { levelId?: string; categoryId?: string; status?: string; search?: string }
   onFilterChange: (filters: any) => void
   onRefresh: () => void
 }
@@ -124,9 +126,19 @@ export function QuestionsTable({
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <NativeSelect
-          className="w-36"
-          value={filters.levelId || 'all'}
+  <div className="relative w-full sm:w-64">
+    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+    <Input
+      placeholder="Search question or option text..."
+      className="pl-9"
+      value={filters.search || ''}
+      onChange={(e) => onFilterChange({ ...filters, search: e.target.value || undefined })}
+    />
+  </div>
+
+  <NativeSelect
+    className="w-36"
+    value={filters.levelId || 'all'}
           onChange={(e) => onFilterChange({ ...filters, levelId: e.target.value === 'all' ? undefined : e.target.value })}
         >
           <option value="all">All Levels</option>

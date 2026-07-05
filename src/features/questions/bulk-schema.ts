@@ -7,9 +7,9 @@ export const bulkRowSchema = z.object({
   optionC: z.string().min(1, 'Required'),
   optionD: z.string().min(1, 'Required'),
   correctOption: z.enum(['a', 'b', 'c', 'd'], { message: 'Select correct answer' }),
+  difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
   explanation: z.string().optional(),
 })
-
 export const bulkFormSchema = z.object({
   levelId: z.string().uuid('Select a level'),
   chapterId: z.string().optional(),

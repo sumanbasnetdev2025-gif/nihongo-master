@@ -34,6 +34,7 @@ const emptyRow: BulkRowValues = {
   optionC: '',
   optionD: '',
   correctOption: '' as unknown as 'a' | 'b' | 'c' | 'd',
+  difficulty: 'medium',
   explanation: '',
 }
 
@@ -138,7 +139,7 @@ export default function BulkAddQuestionsPage() {
       return;
     }
 
-    replace(
+ replace(
   parsed.map((p) => ({
     questionText: p.questionText,
     optionA: p.optionA,
@@ -146,6 +147,7 @@ export default function BulkAddQuestionsPage() {
     optionC: p.optionC,
     optionD: p.optionD,
     correctOption: (p.correctOption ?? '') as unknown as 'a' | 'b' | 'c' | 'd',
+    difficulty: 'medium' as const,
     explanation: '',
   }))
 )
@@ -300,18 +302,18 @@ export default function BulkAddQuestionsPage() {
         {/* Dynamic question rows */}
         <div className="space-y-4">
           {fields.map((field, index) => (
-            <BulkQuestionRow
-              key={field.id}
-              index={index}
-              register={register}
-              errors={errors}
-              correctOption={watch(`questions.${index}.correctOption`)}
-              onCorrectOptionChange={(v) =>
-                setValue(`questions.${index}.correctOption`, v)
-              }
-              onRemove={() => remove(index)}
-              canRemove={fields.length > 1}
-            />
+          <BulkQuestionRow
+  key={field.id}
+  index={index}
+  register={register}
+  errors={errors}
+  correctOption={watch(`questions.${index}.correctOption`)}
+  onCorrectOptionChange={(v) => setValue(`questions.${index}.correctOption`, v)}
+  difficulty={watch(`questions.${index}.difficulty`)}
+  onDifficultyChange={(v) => setValue(`questions.${index}.difficulty`, v)}
+  onRemove={() => remove(index)}
+  canRemove={fields.length > 1}
+/>
           ))}
         </div>
 

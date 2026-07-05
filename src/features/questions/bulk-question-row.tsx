@@ -8,13 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import type { BulkFormValues } from "./bulk-schema";
-
+import { NativeSelect } from "@/components/ui/native-select";
 interface BulkQuestionRowProps {
   index: number;
   register: UseFormRegister<BulkFormValues>;
   errors: FieldErrors<BulkFormValues>;
   correctOption: "a" | "b" | "c" | "d" | undefined;
   onCorrectOptionChange: (value: "a" | "b" | "c" | "d") => void;
+  difficulty: "easy" | "medium" | "hard" | undefined;
+  onDifficultyChange: (value: "easy" | "medium" | "hard") => void;
   onRemove: () => void;
   canRemove: boolean;
 }
@@ -27,6 +29,8 @@ export function BulkQuestionRow({
   errors,
   correctOption,
   onCorrectOptionChange,
+  difficulty,
+  onDifficultyChange,
   onRemove,
   canRemove,
 }: BulkQuestionRowProps) {
@@ -81,15 +85,30 @@ export function BulkQuestionRow({
         </p>
       )}
 
-      <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">
-          Explanation (optional)
-        </Label>
-        <Textarea
-          rows={2}
-          placeholder="Explanation shown to students after answering"
-          {...register(`questions.${index}.explanation`)}
-        />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="space-y-1.5 sm:col-span-1">
+          <Label className="text-xs text-muted-foreground">Difficulty</Label>
+          <NativeSelect
+            value={difficulty ?? "medium"}
+            onChange={(e) =>
+              onDifficultyChange(e.target.value as "easy" | "medium" | "hard")
+            }
+          >
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </NativeSelect>
+        </div>
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label className="text-xs text-muted-foreground">
+            Explanation (optional)
+          </Label>
+          <Textarea
+            rows={2}
+            placeholder="Explanation shown to students after answering"
+            {...register(`questions.${index}.explanation`)}
+          />
+        </div>
       </div>
     </div>
   );

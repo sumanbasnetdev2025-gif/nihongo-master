@@ -9,6 +9,7 @@ export async function getQuestions(filters?: {
   chapterId?: string
   categoryId?: string
   status?: 'published' | 'draft' | 'all'
+  search?: string
 }) {
   const supabase = await createClient()
   let query = supabase
@@ -21,6 +22,13 @@ export async function getQuestions(filters?: {
   if (filters?.categoryId) query = query.eq('category_id', filters.categoryId)
   if (filters?.status === 'published') query = query.eq('is_published', true)
   if (filters?.status === 'draft') query = query.eq('is_published', false)
+
+  if (filters?.search?.trim()) {
+    const term = `%${filters.search.trim()}%`
+    query = query.or(
+      `question_text.ilike.${term},option_a.ilike.${term},option_b.ilike.${term},option_c.ilike.${term},option_d.ilike.${term}`
+    )
+  }
 
   const { data, error } = await query
   if (error) throw error
@@ -148,6 +156,7 @@ export async function createQuestionsBulk(input: {
     optionC: string
     optionD: string
     correctOption: 'a' | 'b' | 'c' | 'd'
+    difficulty?: 'easy' | 'medium' | 'hard'
     explanation?: string
   }[]
 }) {
@@ -156,21 +165,21 @@ export async function createQuestionsBulk(input: {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const rows = input.questions.map((q) => ({
-    level_id: input.levelId,
-    chapter_id: input.chapterId || null,
-    category_id: input.categoryId,
-    question_text: q.questionText,
-    option_a: q.optionA,
-    option_b: q.optionB,
-    option_c: q.optionC,
-    option_d: q.optionD,
-    correct_option: q.correctOption,
-    explanation: q.explanation || null,
-    is_published: input.isPublished,
-    created_by: user?.id,
-  }))
-
+const rows = input.questions.map((q) => ({
+  level_id: input.levelId,
+  chapter_id: input.chapterId || null,
+  category_id: input.categoryId,
+  question_text: q.questionText,
+  option_a: q.optionA,
+  option_b: q.optionB,
+  option_c: q.optionC,
+  option_d: q.optionD,
+  correct_option: q.correctOption,
+  difficulty: q.difficulty || 'medium',
+  explanation: q.explanation || null,
+  is_published: input.isPublished,
+  created_by: user?.id,
+}))
   const { error, count } = await supabase.from('questions').insert(rows, { count: 'exact' })
 
   if (error) throw error
