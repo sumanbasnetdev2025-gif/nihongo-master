@@ -51,18 +51,15 @@ const onSubmit = async (values: LoginInput) => {
         .single()
 
       if (profile?.role === 'admin') {
-        router.push('/admin')
+        window.location.href = '/admin'
       } else {
-        router.push('/dashboard')
+        window.location.href = '/dashboard'
       }
     } else {
-      router.push('/dashboard')
+      window.location.href = '/dashboard'
     }
-
-    router.refresh()
   } catch (err) {
     setServerError(err instanceof Error ? err.message : 'Invalid email or password')
-  } finally {
     setLoading(false)
   }
 }

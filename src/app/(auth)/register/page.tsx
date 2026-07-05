@@ -28,19 +28,17 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   })
 
-  const onSubmit = async (values: RegisterInput) => {
-    setServerError(null)
-    setLoading(true)
-    try {
-      await signUp(values)
-      router.push('/dashboard')
-      router.refresh()
-    } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
-      setLoading(false)
-    }
+const onSubmit = async (values: RegisterInput) => {
+  setServerError(null)
+  setLoading(true)
+  try {
+    await signUp(values)
+    window.location.href = '/dashboard'
+  } catch (err) {
+    setServerError(err instanceof Error ? err.message : 'Something went wrong')
+    setLoading(false)
   }
+}
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 sm:px-4 py-8 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
