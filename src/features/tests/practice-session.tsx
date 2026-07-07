@@ -37,8 +37,6 @@ export function PracticeSession({ attemptId }: PracticeSessionProps) {
     reset,
   } = usePracticeStore()
 
-  // If the store doesn't match this URL (e.g. the page was refreshed and
-  // memory was cleared), send the student back to set up a fresh session
   useEffect(() => {
     if (storedAttemptId !== attemptId) {
       router.replace('/tests')
@@ -46,7 +44,12 @@ export function PracticeSession({ attemptId }: PracticeSessionProps) {
   }, [storedAttemptId, attemptId, router])
 
   if (storedAttemptId !== attemptId || questions.length === 0) {
-    return null
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <p className="text-muted-foreground">Loading your practice session…</p>
+      </div>
+    )
   }
 
   const isFinished = currentIndex >= questions.length
@@ -75,36 +78,23 @@ export function PracticeSession({ attemptId }: PracticeSessionProps) {
       try {
         await completeTestAttempt({ attemptId, score: correctCount, timeTakenSeconds })
       } catch {
-        // Score still shows on screen even if this save fails
+        // Proceed to results regardless — the attempt row still has partial data
       }
+      router.push(`/tests/results/${attemptId}`)
+      // Clear the store slightly after navigation kicks off, so this
+      // component shows the "Calculating..." state instead of a blank flash
+      setTimeout(() => reset(), 300)
+      return
     }
     next()
   }
 
   if (isFinished) {
-    const percentage = Math.round((correctCount / questions.length) * 100)
     return (
-      <Card className="mx-auto max-w-lg text-center">
-        <CardHeader>
-          <CardTitle>Practice Complete 🎉</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <div className="text-4xl font-bold">{percentage}%</div>
-            <p className="mt-1 text-muted-foreground">
-              {correctCount} / {questions.length} correct
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button variant="outline" onClick={() => { reset(); router.push('/tests') }}>
-              Back to Tests
-            </Button>
-            <Button onClick={() => { reset(); router.push('/dashboard') }}>
-              Go to Dashboard
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <p className="text-muted-foreground">Calculating your results…</p>
+      </div>
     )
   }
 
