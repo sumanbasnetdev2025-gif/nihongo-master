@@ -7,7 +7,6 @@ import { useCountdown } from '@/hooks/use-countdown'
 import { recordAnswer, completeTestAttempt } from './actions'
 import { QuestionCard } from './question-card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import {
   AlertDialog,
@@ -79,70 +78,22 @@ export function ExamSession({ attemptId }: ExamSessionProps) {
       // Proceed to results regardless
     } finally {
       markSubmitted()
-      reset()
       router.push(`/tests/results/${attemptId}`)
+      // Clear the store slightly after navigation kicks off, so this
+      // component shows the "Calculating..." state instead of a blank flash
+      setTimeout(() => reset(), 300)
     }
   }
 
-  const { formatted, isLow, secondsLeft } = useCountdown(durationSeconds, () => {
+  const { formatted, isLow } = useCountdown(durationSeconds, () => {
     if (!submitted) handleSubmit()
   })
 
   if (storedAttemptId !== attemptId || questions.length === 0) {
-    return null
-  }
-
-  if (submitted) {
-    const correctCount = questions.filter((q) => answers[q.id] === q.correct_option).length
-    const percentage = Math.round((correctCount / questions.length) * 100)
-    const unanswered = questions.length - Object.keys(answers).length
-
     return (
-      <div className="mx-auto max-w-2xl space-y-6">
-        <Card className="text-center">
-          <CardContent className="space-y-4 pt-6">
-            <h2 className="text-2xl font-bold">Exam Submitted 🎯</h2>
-            <div className="text-4xl font-bold">{percentage}%</div>
-            <p className="text-muted-foreground">
-              {correctCount} / {questions.length} correct
-              {unanswered > 0 && ` · ${unanswered} unanswered`}
-            </p>
-            <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-              <Button variant="outline" onClick={() => { reset(); router.push('/tests') }}>
-                Back to Tests
-              </Button>
-              <Button onClick={() => { reset(); router.push('/dashboard') }}>
-                Go to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Full review, per spec: student answer, correct answer, explanation */}
-        <div className="space-y-4">
-          {questions.map((q, i) => {
-            const studentAnswer = answers[q.id]
-            const isCorrect = studentAnswer === q.correct_option
-            return (
-              <Card key={q.id} className={cn('border-l-4', isCorrect ? 'border-l-green-500' : 'border-l-red-500')}>
-                <CardContent className="space-y-2 pt-6">
-                  <p className="text-sm font-medium text-muted-foreground">Question {i + 1}</p>
-                  <p className="font-medium">{q.question_text}</p>
-                  <p className="text-sm">
-                    Your answer:{' '}
-                    <span className={isCorrect ? 'text-green-600' : 'text-red-600'}>
-                      {studentAnswer ? studentAnswer.toUpperCase() : 'Not answered'}
-                    </span>
-                    {' · '}Correct answer: <span className="text-green-600">{q.correct_option.toUpperCase()}</span>
-                  </p>
-                  {q.explanation && (
-                    <p className="text-sm text-muted-foreground">{q.explanation}</p>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <p className="text-muted-foreground">Calculating your results…</p>
       </div>
     )
   }

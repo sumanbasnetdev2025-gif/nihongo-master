@@ -5,7 +5,9 @@ import { Pencil } from "lucide-react";
 import { QuickRenameDialog } from "@/components/shared/quick-rename-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutButton } from "../ui/shared/logout-button";
-
+import { PanelLeftClose } from 'lucide-react'
+import { useUIStore } from '@/stores/ui-store'
+import { Button } from "../ui/button";
 interface HeaderProps {
   fullName: string | null;
   avatarUrl?: string | null;
@@ -29,6 +31,14 @@ export function Header({
         .slice(0, 2)
         .toUpperCase()
     : "U";
+    function HideMenuButton() {
+  const toggleChrome = useUIStore((s) => s.toggleChrome)
+  return (
+    <Button variant="ghost" size="icon" onClick={toggleChrome} aria-label="Hide menu" title="Hide menu">
+      <PanelLeftClose className="h-4 w-4" />
+    </Button>
+  )
+}
 
   return (
     <header className="flex h-16 w-full items-center justify-between overflow-hidden border-b bg-background px-3 md:px-6">

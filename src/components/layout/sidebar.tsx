@@ -11,8 +11,12 @@ import {
   Settings,
   Flame,
   XCircle,
+  PanelLeftClose,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Logo } from '../shared/logo'
+import { Button } from '../ui/button'
+import { useUIStore } from '@/stores/ui-store'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,12 +31,26 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+const toggleChrome = useUIStore((s) => s.toggleChrome)
 
   return (
     <aside className="hidden w-64 shrink-0 border-r bg-background md:flex md:flex-col">
-      <div className="flex h-16 items-center border-b px-6">
-        <span className="text-lg font-bold tracking-tight">Nihongo Master</span>
-      </div>
+    <div className="flex h-16 items-center justify-between border-b px-6">
+  <span className="flex items-center gap-2 text-lg font-bold tracking-tight">
+    <Logo />
+    Nihongo Master
+  </span>
+  <Button
+    variant="ghost"
+    size="icon"
+    onClick={toggleChrome}
+    className="h-7 w-7"
+    aria-label="Hide menu"
+    title="Hide menu"
+  >
+    <PanelLeftClose className="h-4 w-4" />
+  </Button>
+</div>
 
       <nav className="flex-1 space-y-1 p-4">
         {navItems.map((item) => {
