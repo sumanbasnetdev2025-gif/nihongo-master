@@ -69,15 +69,17 @@ export async function createQuestion(input: QuestionInput) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const stripStar = (text: string) => text.replace(/^\*|\*$/g, '').trim()
+
   const { error } = await supabase.from('questions').insert({
     level_id: parsed.levelId,
     chapter_id: parsed.chapterId || null,
     category_id: parsed.categoryId,
-    question_text: parsed.questionText,
-    option_a: parsed.optionA,
-    option_b: parsed.optionB,
-    option_c: parsed.optionC,
-    option_d: parsed.optionD,
+    question_text: stripStar(parsed.questionText),
+    option_a: stripStar(parsed.optionA),
+    option_b: stripStar(parsed.optionB),
+    option_c: stripStar(parsed.optionC),
+    option_d: stripStar(parsed.optionD),
     correct_option: parsed.correctOption,
     explanation: parsed.explanation || null,
     grammar_notes: parsed.grammarNotes || null,
@@ -165,15 +167,18 @@ export async function createQuestionsBulk(input: {
     data: { user },
   } = await supabase.auth.getUser()
 
+
+const stripStar = (text: string) => text.replace(/^\*|\*$/g, '').trim()
+
 const rows = input.questions.map((q) => ({
   level_id: input.levelId,
   chapter_id: input.chapterId || null,
   category_id: input.categoryId,
-  question_text: q.questionText,
-  option_a: q.optionA,
-  option_b: q.optionB,
-  option_c: q.optionC,
-  option_d: q.optionD,
+  question_text: stripStar(q.questionText),
+  option_a: stripStar(q.optionA),
+  option_b: stripStar(q.optionB),
+  option_c: stripStar(q.optionC),
+  option_d: stripStar(q.optionD),
   correct_option: q.correctOption,
   difficulty: q.difficulty || 'medium',
   explanation: q.explanation || null,

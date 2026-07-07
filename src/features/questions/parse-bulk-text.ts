@@ -7,33 +7,39 @@ export interface ParsedQuestion {
   correctOption?: 'a' | 'b' | 'c' | 'd'
 }
 
-// Matches lettered options: A. text / *B) text / etc.
-const LETTER_OPTION = /^(\*?)([A-Da-d])[.).]\s*(.+)$/
-// Matches numbered options: 1. text / *2. text / etc.
-const NUMBER_OPTION = /^(\*?)([1-4])[.).]\s*(.+)$/
+// Matches lettered options with an optional * at the START or END:
+// "A. text", "*B. text", "C. text*" — all valid
+const LETTER_OPTION = /^(\*?)([A-Da-d])[.).]\s*(.+?)(\*?)$/
+// Same idea for numbered options: "1. text", "*2. text", "3. text*"
+const NUMBER_OPTION = /^(\*?)([1-4])[.).]\s*(.+?)(\*?)$/
 
 const LABEL_LINE = /^(もんだい|問題|Q\.?|Question)\s*\d*\s*[:.．]?\s*$/i
 
-// Maps a matched option line (either style) to a normalized letter + text + correctness
 function matchOption(line: string): { letter: 'a' | 'b' | 'c' | 'd'; text: string; isCorrect: boolean } | null {
   const letterMatch = line.match(LETTER_OPTION)
   if (letterMatch) {
-    const [, star, letter, text] = letterMatch
-    return { letter: letter.toLowerCase() as 'a' | 'b' | 'c' | 'd', text: text.trim(), isCorrect: star === '*' }
+    const [, leadingStar, letter, text, trailingStar] = letterMatch
+    return {
+      letter: letter.toLowerCase() as 'a' | 'b' | 'c' | 'd',
+      text: text.trim(),
+      isCorrect: leadingStar === '*' || trailingStar === '*',
+    }
   }
 
   const numberMatch = line.match(NUMBER_OPTION)
   if (numberMatch) {
-    const [, star, num, text] = numberMatch
+    const [, leadingStar, num, text, trailingStar] = numberMatch
     const letterFromNumber = (['a', 'b', 'c', 'd'] as const)[Number(num) - 1]
-    return { letter: letterFromNumber, text: text.trim(), isCorrect: star === '*' }
+    return {
+      letter: letterFromNumber,
+      text: text.trim(),
+      isCorrect: leadingStar === '*' || trailingStar === '*',
+    }
   }
 
   return null
 }
 
-// Checks if a line looks like the FIRST option of either style (A. / 1.)
-// — this is what signals "options are starting now" while scanning
 function isFirstOption(line: string): boolean {
   const match = matchOption(line)
   return match?.letter === 'a'
