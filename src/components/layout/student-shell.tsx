@@ -19,14 +19,16 @@ const FOCUS_ROUTE_PREFIXES = ['/tests/practice/', '/tests/exam/']
 
 export function StudentShell({ fullName, avatarUrl, children }: StudentShellProps) {
   const pathname = usePathname()
-  const { chromeHidden, hideChrome } = useUIStore()
+const { chromeHidden, hideChrome, showChrome } = useUIStore()
 
- useEffect(() => {
+useEffect(() => {
   const shouldAutoHide = FOCUS_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   if (shouldAutoHide) {
     hideChrome()
+  } else {
+    showChrome()
   }
-}, [pathname, hideChrome])
+}, [pathname, hideChrome, showChrome])
 
   return (
     <div className="flex min-h-screen">
@@ -38,9 +40,9 @@ export function StudentShell({ fullName, avatarUrl, children }: StudentShellProp
         {!chromeHidden && (
           <Header fullName={fullName} avatarUrl={avatarUrl} mobileNav={<MobileNav />} />
         )}
-        <main className={`flex-1 bg-muted/30 p-4 md:p-6 ${chromeHidden ? 'pt-16' : ''}`}>
-          {children}
-        </main>
+        <main className="flex-1 bg-muted/30 p-4 md:p-6">
+  {children}
+</main>
       </div>
     </div>
   )

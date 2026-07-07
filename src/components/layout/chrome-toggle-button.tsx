@@ -16,8 +16,8 @@ export function ChromeToggleButton() {
       size="icon"
       onClick={toggleChrome}
       className={cn(
-        'fixed left-4 top-4 z-50 h-10 w-10 rounded-full shadow-lg'
-      )}
+  'fixed bottom-4 left-4 z-50 h-10 w-10 rounded-full shadow-lg'
+)}
       aria-label="Show menu"
       title="Show menu"
     >
