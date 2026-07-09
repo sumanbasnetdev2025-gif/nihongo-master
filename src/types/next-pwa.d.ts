@@ -16,6 +16,7 @@ declare module 'next-pwa' {
     reloadOnOnline?: boolean
     dynamicStartUrl?: boolean
     cacheStartUrl?: boolean
+    cleanupOutdatedCaches?: boolean
   }
 
   export default function withPWAInit(

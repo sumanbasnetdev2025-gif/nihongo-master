@@ -8,6 +8,7 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === "development",
   cacheOnFrontEndNav: false,
   reloadOnOnline: true,
+  cleanupOutdatedCaches: true,
 });
 
 const nextConfig: NextConfig = {
