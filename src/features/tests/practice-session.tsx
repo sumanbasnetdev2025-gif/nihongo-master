@@ -106,6 +106,9 @@ export function PracticeSession({ attemptId }: PracticeSessionProps) {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <div className="space-y-2">
+        <div className="rounded bg-green-100 p-1 text-center text-xs font-bold text-green-800">
+          BUILD CHECK: instant-reveal-v2
+        </div>
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>
             Question {currentIndex + 1} of {questions.length}
