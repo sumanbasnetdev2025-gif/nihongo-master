@@ -25,7 +25,16 @@ export default function DuplicateQuestionsPage() {
   // refetch-after-edit helper
   const refetch = () => {
     if (!levelId) return
-    findDuplicateQuestions(levelId).then(setGroups)
+    findDuplicateQuestions(levelId).then((data) => {
+      // Deduplicate questions inside each group by id
+      const processed = data.map((group) => ({
+        ...group,
+        questions: Array.from(
+          new Map(group.questions.map((q: any) => [q.id, q])).values()
+        ),
+      }))
+      setGroups(processed)
+    })
   }
 
   useEffect(() => {
@@ -40,7 +49,16 @@ export default function DuplicateQuestionsPage() {
     if (!levelId) return
     setLoading(true)
     findDuplicateQuestions(levelId)
-      .then(setGroups)
+      .then((data) => {
+        // Deduplicate questions inside each group by id
+        const processed = data.map((group) => ({
+          ...group,
+          questions: Array.from(
+            new Map(group.questions.map((q: any) => [q.id, q])).values()
+          ),
+        }))
+        setGroups(processed)
+      })
       .finally(() => setLoading(false))
   }, [levelId])
 
@@ -98,9 +116,10 @@ export default function DuplicateQuestionsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Questions are now deduplicated by id */}
                 {group.questions.map((q: any) => (
                   <div
-                    key={q.id}
+                    key={q.id} // fixed: use q.id as key (no index needed)
                     className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm"
                   >
                     <div className="flex flex-wrap items-center gap-2">
@@ -155,31 +174,31 @@ export default function DuplicateQuestionsPage() {
             refetch()
           }
         }}
-       editingQuestion={
-  editingQuestion
-    ? {
-        id: editingQuestion.id,
-        level_id: editingQuestion.level_id,
-        chapter_id: editingQuestion.chapter_id,
-        category_id: editingQuestion.category_id,
-        question_text: editingQuestion.question_text,
-        option_a: editingQuestion.option_a,
-        option_b: editingQuestion.option_b,
-        option_c: editingQuestion.option_c,
-        option_d: editingQuestion.option_d,
-        correct_option: editingQuestion.correct_option,
-        explanation: editingQuestion.explanation,
-        grammar_notes: editingQuestion.grammar_notes,
-        vocabulary_meaning: editingQuestion.vocabulary_meaning,
-        kanji_reading: editingQuestion.kanji_reading,
-        difficulty: editingQuestion.difficulty,
-        tags: editingQuestion.tags,
-        image_url: editingQuestion.image_url,
-        audio_url: editingQuestion.audio_url,
-        is_published: editingQuestion.isPublished,
-      }
-    : null
-}
+        editingQuestion={
+          editingQuestion
+            ? {
+                id: editingQuestion.id,
+                level_id: editingQuestion.level_id,
+                chapter_id: editingQuestion.chapter_id,
+                category_id: editingQuestion.category_id,
+                question_text: editingQuestion.question_text,
+                option_a: editingQuestion.option_a,
+                option_b: editingQuestion.option_b,
+                option_c: editingQuestion.option_c,
+                option_d: editingQuestion.option_d,
+                correct_option: editingQuestion.correct_option,
+                explanation: editingQuestion.explanation,
+                grammar_notes: editingQuestion.grammar_notes,
+                vocabulary_meaning: editingQuestion.vocabulary_meaning,
+                kanji_reading: editingQuestion.kanji_reading,
+                difficulty: editingQuestion.difficulty,
+                tags: editingQuestion.tags,
+                image_url: editingQuestion.image_url,
+                audio_url: editingQuestion.audio_url,
+                is_published: editingQuestion.isPublished,
+              }
+            : null
+        }
       />
     </div>
   )
