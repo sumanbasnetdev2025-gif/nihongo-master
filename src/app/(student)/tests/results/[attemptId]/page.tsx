@@ -31,12 +31,24 @@ export default async function ResultsPage({
     passed,
   } = await getTestResult(attemptId);
 
+  console.log("RESULTS DEBUG:", {
+    score,
+    totalQuestions,
+    percentage,
+    passed,
+    mode: attempt.mode,
+  });
+  
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* Header summary */}
       <Card>
         <CardContent className="space-y-6 pt-6">
           <Celebration passed={passed} />
+          <div className="rounded bg-yellow-100 p-2 text-center text-xs text-yellow-900">
+            DEBUG — score: {score}, total: {totalQuestions}, percentage:{" "}
+            {percentage}%, passed: {String(passed)}
+          </div>
           <div className="flex flex-col items-center gap-3 text-center">
             {passed && <p className="text-2xl">🎉🌸🎉</p>}
             <Badge
