@@ -12,6 +12,10 @@ declare module 'next-pwa' {
     buildExcludes?: (string | RegExp)[]
     publicExcludes?: string[]
     fallbacks?: Record<string, string>
+    cacheOnFrontEndNav?: boolean
+    reloadOnOnline?: boolean
+    dynamicStartUrl?: boolean
+    cacheStartUrl?: boolean
   }
 
   export default function withPWAInit(
